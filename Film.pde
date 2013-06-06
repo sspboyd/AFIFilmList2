@@ -2,12 +2,13 @@ class Film {
 
   String name;
   int yr;
-  int ranking;
+  int ranking_07;
+  int ranking_98;
   float targX, x, targY, y, targW, w;
 
   void update() {
-    x += (targX - x) * .075;
-    y += (targY - y) * .075;
+    x += (targX - x) * .05;
+    y += (targY - y) * .05;
     w += (targW - w) * .275;
   }
 
@@ -25,12 +26,16 @@ class Film {
     targW = 25;
       fill(170);
       textFont(yearLabel);
-      text(yr + ", #" + ranking, 15, 18);
+      text(yr + ", #" + ranking_07, 15, 18); // bug: needs a ref to the current metric eg. current_Ranking, or just ranking 
       fill(0);
       textFont(filmName);
       text(name, 15, 0 );
     }
     popMatrix();
+  }
+  
+  void updateRanking(){
+  
   }
 }
 

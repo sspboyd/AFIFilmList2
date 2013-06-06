@@ -1,5 +1,3 @@
-import processing.opengl.*;
-
 float PHI = 0.618033989;
 
 Film[] films;
@@ -8,14 +6,20 @@ PFont filmName;
 PFont yearLabel;
 PFont titleLabel;
 
+
+String title ="AFI Top 100 Films";
+String subHeading;
+
 String[] data;
 
-// int chartWidth = 1680;
-int chartWidth = 1280; // 9b100 screen size 
+int chartWidth = 1680;
+// int chartWidth = 1280; // 9b100 screen size 
 // int chartWidth = 1344;
 // int chartWidth = 3000;
 // int chartWidth = 1024;
 // int chartWidth = 640;
+// int chartWidth = screenWidth;
+
 int chartHeight  = (int)(chartWidth * pow(PHI, 1));
 float margin = chartWidth * pow(PHI, 7);
 float plotX1;
@@ -34,9 +38,10 @@ void setup() {
 
   String fileName = "afiFilmList.txt";
   films=getFilms(fileName);
+  subHeading = "2007 Ranking";
   for (Film f : films) {
     f.targX = map(f.yr, 1910, 2015, plotX1, plotX2);
-    f.targY = map(f.ranking, 1, 100, plotY1, plotY2);
+    f.targY = map(f.ranking_07, 1, 100, plotY1, plotY2);
     // f.x = random(plotX1, plotX2);
     // f.y = random(plotY1, plotY2);
     f.x = width/2+random(5);
@@ -54,10 +59,14 @@ void setup() {
 void draw() {
   background(255);
   drawYearLabels();
+  drawRankingLabels();
   textFont(titleLabel);
   fill(0); 
   noStroke();
-  text("AFI Top 100 Films", plotX1, plotY1-10);
+  float tw = textWidth(title); 
+  text(title, plotX1, plotY1-10);
+  textFont(filmName);
+  text(subHeading, plotX1 + tw + 30, plotY1 - 10);
   for (Film f : films) {
     f.update();
     f.render();
@@ -76,13 +85,14 @@ Film[] getFilms(String fn) {
   println("number of lines of data : " + (data.length - 1));
   for (int i = 0; i < data.length - 1; i++) {
     String[] pieces = split(data[i], TAB);
-    if (int(pieces[2]) > 0) {    
+    if (int(pieces[3]) > 0 || int(pieces[2]) > 0) {    
       Film f = new Film();
       f.x = 0;
       f.y = 0;
       f.name = pieces[0];
       f.yr = int(pieces[1]);
-      f.ranking = int(pieces[2]);
+      f.ranking_98 = int(pieces[2]);
+      f.ranking_07 = int(pieces[3]);
       films[rowCount++] = f;
     }
   }
@@ -107,6 +117,18 @@ void drawYearLabels() {
     text(i, lx, plotY2+18);
   }
   //popMatrix();
+}
+
+void drawRankingLabels() {
+  fill(200);
+  textFont(yearLabel);
+  for (int i = 1; i<100; i+=50) {
+    float ly = map(i, 100, 1, plotY2, plotY1);
+    stroke(220);
+    strokeWeight(.5);
+    // line(plotX1, ly, plotX2, ly);
+    text("#"+i, plotX1-textWidth("1000"), ly);
+  }
 }
 
 
@@ -151,11 +173,34 @@ void drawByRow() {
 
 
 
-
 // UI and Save Functions___________________________________________
 
 void keyPressed() {
   if (key == 'S') screenCap(".tif");
+
+  if (key == '7') {
+    subHeading = "2007 Ranking";
+
+    for (Film f : films) {
+      if (f.ranking_07 == 0) {
+        f.targY = height+150;
+      }
+      else {
+        f.targY = map(f.ranking_07, 1, 100, plotY1, plotY2);
+      }
+    }
+  }
+  if (key == '8') {
+    subHeading = "1998 Ranking";
+    for (Film f : films) {
+      if (f.ranking_98 == 0) {
+        f.targY = height+150;
+      }
+      else {
+        f.targY = map(f.ranking_98, 1, 100, plotY1, plotY2);
+      }
+    }
+  }
 }
 
 void screenCap(String type) {
